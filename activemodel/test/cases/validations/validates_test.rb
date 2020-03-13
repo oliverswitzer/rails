@@ -158,6 +158,16 @@ class ValidatesTest < ActiveModel::TestCase
     assert_equal ["does not appear to be like Mr."], person.errors[:title]
   end
 
+  def test_validates_with_specifying_a_validator
+    Person.validates :email, email: { validator: Namespace::EmailValidator, message: 'Y U NO WRITE EMAIL CORRECTLY' }
+
+    person = Person.new
+    person.email = 'not-a-correct-email'
+    person.valid?
+
+    assert_equal ['Y U NO WRITE EMAIL CORRECTLY'], person.errors[:email]
+  end
+
   def test_defining_extra_default_keys_for_validates
     Topic.validates :title, confirmation: true, message: "Y U NO CONFIRM"
     topic = Topic.new

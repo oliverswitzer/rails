@@ -113,10 +113,14 @@ module ActiveModel
         defaults[:attributes] = attributes
 
         validations.each do |key, options|
-          key = "#{key.to_s.camelize}Validator"
-
           begin
-            validator = key.include?("::") ? key.constantize : const_get(key)
+            validator = begin
+              if options[:validator] && options[:validator] < ActiveModel::EachValidator
+                options[:validator]
+              else
+                key.include?("::") ? key.constantize : const_get(key)
+              end
+            end
           rescue NameError
             raise ArgumentError, "Unknown validator: '#{key}'"
           end
